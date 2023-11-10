@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="stadoff_length" value="0.220"/>
+    <xacro:property name="stadoff_radius" value="0.01"/>
+
+    <xacro:macro name="stadoff_element" params="stadoff_name stadoff_position">
+        <link name="${stadoff_name}">
+            <visual>
+                <geometry>
+                    <cylinder length="${stadoff_length}" radius="${stadoff_radius}"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 ${stadoff_length/2}" />
+            </visual>
+
+            <collision>
+                <geometry>
+                    <cylinder length="${stadoff_length}" radius="${stadoff_radius}"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 ${stadoff_length/2}" />
+            </collision>
+
+            <inertial>
+                <origin rpy="0 0 0" xyz="0 0 ${stadoff_length/2}"/>
+                <mass value="0.05"/>
+                <inertia ixx="0.0002029" ixy="0" ixz="0" iyy="0.0002029" iyz="0" izz="0.0000025"/>
+            </inertial>
+        </link>
+
+        <joint name="${stadoff_name}_chassis_link_joint" type="fixed">
+            <origin rpy="0 0 0" xyz="${stadoff_position}" />
+            <parent link="chassis" />
+            <child link="${stadoff_name}" />
+        </joint>
+    </xacro:macro> 
+
+</robot>

@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="laser_base_length" value="0.03"/>
+    <xacro:property name="laser_base_radius" value="0.02"/>
+
+    <xacro:property name="laser_frame_length" value="0.04"/>
+    <xacro:property name="laser_frame_radius" value="0.015"/>
+
+    <xacro:macro name="laser_element">
+        <link name="laser_base">
+            <visual>
+                <geometry>
+                    <cylinder length="${laser_base_length}" radius="${laser_base_radius}"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 ${laser_base_length/2}"/>
+            </visual>
+
+            <collision>
+                <geometry>
+                    <cylinder length="0.03" radius="0.02"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 ${laser_base_length/2}"/>
+            </collision>
+
+            <inertial>
+                <mass value="0.01"/>
+                <origin rpy="0 0 0" xyz="0 0 ${laser_base_length/2}"/>
+                <inertia ixx="0.00000175" ixy="0" ixz="0" iyy="0.00000175" iyz="0" izz="0.000002"/>
+            </inertial>
+        </link>
+
+        <link name="laser_frame">
+            <visual>
+                <geometry>
+                    <mesh filename="package://barista_robot_description/meshes/hokuyo3d.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 ${laser_frame_length/2}"/>
+            </visual>
+
+            <collision>
+                <geometry>
+                    <cylinder length="${laser_frame_length}" radius="${laser_frame_radius}"/>
+                </geometry>
+                <origin rpy="0 0 0" xyz="0 0 ${laser_frame_length/2}"/>
+            </collision>
+
+            <inertial>
+                <mass value="0.01"/>
+                <origin rpy="0 0 0" xyz="0 0 ${laser_frame_length/2}"/>
+                <inertia ixx="0.0001339" ixy="0" ixz="0" iyy="0.0001339" iyz="0" izz="0.000001125"/>
+            </inertial>
+        </link>
+
+        <joint name="laser_base_chassis_link_joint" type="fixed">
+            <origin rpy="0 0 0" xyz="0 0.1 0.0775" />
+            <parent link="chassis" />
+            <child link="laser_base" />
+        </joint>
+
+        <joint name="laser_frame_laser_base_link_joint" type="fixed">
+            <origin rpy="0 0 0" xyz="0 0 0.015" />
+            <parent link="laser_base" />
+            <child link="laser_frame" />
+        </joint>
+
+        <gazebo reference="laser_frame">
+            <sensor name="sensor_ray" type="ray">
+                <pose>0 0 0 0 0 0</pose>
+                <ray>
+                <scan>
+                    <horizontal>
+                    <samples>200</samples>
+                    <resolution>1.0</resolution>
+                    <min_angle>-3.14</min_angle>
+                    <max_angle>3.14</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.05</min>
+                    <max>5.0</max>
+                </range>
+                </ray>
+                <always_on>true</always_on>
+                <visualize>true</visualize>
+                <update_rate>100.0</update_rate>
+                <plugin name="laser" filename="libgazebo_ros_ray_sensor.so">
+                <ros>
+                    <remapping>~/out:=scan</remapping>
+                </ros>
+                <output_type>sensor_msgs/LaserScan</output_type>
+                </plugin>
+            </sensor>
+        </gazebo>
+    </xacro:macro> 
+    
+</robot>

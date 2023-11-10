@@ -32,6 +32,7 @@ install(
 	launch
 	worlds
 	rviz
+	xacro
   DESTINATION
     share/${PROJECT_NAME}/
 )

@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="barista_robot">
+
+    <xacro:arg name="include_laser" default="true"/>
+
+    <xacro:include filename="$(find barista_robot_description)/xacro/wheel.xacro" />
+    <xacro:include filename="$(find barista_robot_description)/xacro/standoff.xacro" />
+    <xacro:include filename="$(find barista_robot_description)/xacro/cup_holder_tray.xacro" />
+    <xacro:include filename="$(find barista_robot_description)/xacro/laser_scanner.xacro" />
+
+    <link name="base_link">
+    </link>
+
+  <!-- Body -->
+    <link name="chassis">
+        <visual>
+            <geometry>
+                <cylinder length="0.155" radius="0.178"/>
+            </geometry>
+        </visual>
+
+        <collision>
+            <geometry>
+                <cylinder length="0.155" radius="0.178"/>
+            </geometry>
+        </collision>
+
+        <inertial>
+            <mass value="0.5"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="0.004962" ixy="0" ixz="0" iyy="0.004962" iyz="0" izz="0.007921"/>
+        </inertial>
+    </link>
+
+    <joint name="base_chassis_link_joint" type="fixed">
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <parent link="base_link" />
+        <child link="chassis" />
+    </joint>    
+
+  <!-- Standoffs -->
+    <xacro:stadoff_element stadoff_name="standoff_1" stadoff_position="0.118 0.04 0.0775" />
+    <xacro:stadoff_element stadoff_name="standoff_2" stadoff_position="0.118 -0.04 0.0775" />
+    <xacro:stadoff_element stadoff_name="standoff_3" stadoff_position="-0.118 0.04 0.0775" />
+    <xacro:stadoff_element stadoff_name="standoff_4" stadoff_position="-0.118 -0.04 0.0775" />
+
+  <!-- cup tray -->
+    <xacro:cup_tray_element tray_position="0 0 0.2975" />
+
+  <!-- wheels -->
+    <xacro:wheel_element wheel_name="wheel_right" wheel_position="0.133 0 -0.0775"/>
+    <xacro:wheel_element wheel_name="wheel_left" wheel_position="-0.133 0 -0.0775"/>
+
+    <xacro:caster_element caster_name="caster_front" caster_position="0 0.133 -0.0775" />
+    <xacro:caster_element caster_name="caster_back" caster_position="0 -0.133 -0.0775" />
+
+  <!-- laser -->
+    <xacro:if value="$(arg include_laser)">
+        <xacro:laser_element />
+    </xacro:if>
+
+    <gazebo>
+        <plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
+
+        <!-- wheels -->
+        <left_joint>wheel_left_chassis_link_joint</left_joint>
+        <right_joint>wheel_right_chassis_link_joint</right_joint>
+
+        <!-- kinematics -->
+        <wheel_separation>0.266</wheel_separation>
+        <wheel_diameter>0.0704</wheel_diameter>
+
+        <!-- limits -->
+        <max_wheel_torque>1.0</max_wheel_torque>
+        <max_wheel_acceleration>2.0</max_wheel_acceleration>
+
+        <!-- output -->
+        <publish_odom>true</publish_odom>
+        <publish_odom_tf>true</publish_odom_tf>
+
+        <odometry_frame>odom</odometry_frame>
+        <robot_base_frame>base_link</robot_base_frame>
+
+        </plugin>
+    </gazebo>
+
+</robot>
