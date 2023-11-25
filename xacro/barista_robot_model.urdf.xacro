@@ -3,6 +3,8 @@
 
     <xacro:arg name="include_laser" default="true"/>
 
+    <xacro:property name="robot_name" value="$(arg robot_name)"/>
+
     <xacro:include filename="$(find barista_robot_description)/xacro/wheel.xacro" />
     <xacro:include filename="$(find barista_robot_description)/xacro/standoff.xacro" />
     <xacro:include filename="$(find barista_robot_description)/xacro/cup_holder_tray.xacro" />
@@ -62,26 +64,44 @@
     <gazebo>
         <plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
 
-        <!-- wheels -->
-        <left_joint>wheel_left_chassis_link_joint</left_joint>
-        <right_joint>wheel_right_chassis_link_joint</right_joint>
+            <ros>
+                <namespace>/${robot_name}</namespace>
+                <remapping>/cmd_vel:=cmd_vel</remapping>
+            </ros>
 
-        <!-- kinematics -->
-        <wheel_separation>0.266</wheel_separation>
-        <wheel_diameter>0.0704</wheel_diameter>
+            <!-- wheels -->
+            <left_joint>wheel_left_chassis_link_joint</left_joint>
+            <right_joint>wheel_right_chassis_link_joint</right_joint>
 
-        <!-- limits -->
-        <max_wheel_torque>1.0</max_wheel_torque>
-        <max_wheel_acceleration>2.0</max_wheel_acceleration>
+            <!-- kinematics -->
+            <wheel_separation>0.266</wheel_separation>
+            <wheel_diameter>0.0704</wheel_diameter>
 
-        <!-- output -->
-        <publish_odom>true</publish_odom>
-        <publish_odom_tf>true</publish_odom_tf>
+            <!-- limits -->
+            <max_wheel_torque>1.0</max_wheel_torque>
+            <max_wheel_acceleration>2.0</max_wheel_acceleration>
 
-        <odometry_frame>odom</odometry_frame>
-        <robot_base_frame>base_link</robot_base_frame>
+            <!-- output -->
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+
+            <odometry_frame>${robot_name}/odom</odometry_frame>>
+            <robot_base_frame>${robot_name}/base_link</robot_base_frame>
 
         </plugin>
+
+        <plugin name="box_bot_joint_state" filename="libgazebo_ros_joint_state_publisher.so">
+            <ros>
+                <namespace>/${robot_name}</namespace>
+                <remapping>~/out:=joint_states</remapping>
+            </ros>
+            <update_rate>30</update_rate>
+
+            <joint_name>wheel_left_chassis_link_joint</joint_name>
+            <joint_name>wheel_right_chassis_link_joint</joint_name>
+            
+        </plugin>
+
     </gazebo>
 
 </robot>

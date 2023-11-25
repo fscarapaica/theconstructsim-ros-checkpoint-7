@@ -93,7 +93,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py'),
         )
-    )    
+    )
 
     # create and return launch description object
     return LaunchDescription(
