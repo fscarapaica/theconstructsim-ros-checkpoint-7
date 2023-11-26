@@ -52,8 +52,8 @@ def generate_launch_description():
   ####### GAZEBO END##########
 
 
-    robot_entity_name_1 = 'rick'#robot_base_name+"_"+str(int(random.random()*100000))
-    robot_entity_name_2 = 'morty'#robot_base_name+"_"+str(int(random.random()*100000))
+    robot_entity_name_1 = 'rick' #robot_base_name+"_"+str(int(random.random()*100000))
+    robot_entity_name_2 = 'morty' #robot_base_name+"_"+str(int(random.random()*100000))
 
     # Robot State Publisher (xacro robot description)
     robot_description_1 = xacro.process_file(robot_desc_path, mappings={"robot_name": robot_entity_name_1}).toxml()
@@ -83,8 +83,8 @@ def generate_launch_description():
 
     # Position and orientation
     # [X, Y, Z]
-    position = [0.0, 0.0, 0.3]
-    position2 = [1.0, 0.0, 0.3]
+    position = [0.0, 0.0, 0.2]
+    position2 = [1.0, 0.0, 0.2]
     # [Roll, Pitch, Yaw]
     orientation = [0.0, 0.0, 0.0]
 
@@ -129,11 +129,22 @@ def generate_launch_description():
             parameters=[{'use_sim_time': True}],
             arguments=['-d', rviz_config_dir])
 
-    joint_state_publisher = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        namespace=robot_entity_name_1,
+    static_tf_robot_odom_to_world_1 = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher_rick_odom',
         output='screen',
+        emulate_tty=True,
+        arguments=['0', '0', '0', '0', '0', '0', 'world', robot_entity_name_1 + '/odom']
+    )
+
+    static_tf_robot_odom_to_world_2 = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher_morty_odom',
+        output='screen',
+        emulate_tty=True,
+        arguments=['0', '0', '0', '0', '0', '0', 'world', robot_entity_name_2 + '/odom']
     )
 
     # create and return launch description object
@@ -142,8 +153,9 @@ def generate_launch_description():
             gazebo,
             robot_state_publisher_node1,
             robot_state_publisher_node2,
-            #rviz_node,
-            #joint_state_publisher,
+            static_tf_robot_odom_to_world_1,
+            static_tf_robot_odom_to_world_2,
+            rviz_node,
             spawn_robot1,
             spawn_robot2,
         ]
